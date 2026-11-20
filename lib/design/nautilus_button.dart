@@ -5,7 +5,8 @@ import 'tokens.dart';
 /// Bouton principal accessible : cible >= 48 dp, libellé Semantics en français,
 /// texte agrandissable (retour à la ligne, pas de troncature) et indicateur
 /// de focus clavier explicite (contour de [NautilusTokens.focusRingWidth] dp
-/// dans la couleur de texte du thème, séparé du bouton par un espace).
+/// dans la couleur de texte du thème, séparé du bouton par
+/// [NautilusTokens.focusRingGap] dp ; surcroît de 5 dp par côté, toujours réservé).
 class NautilusButton extends StatefulWidget {
   const NautilusButton({
     super.key,
@@ -62,7 +63,9 @@ class _NautilusButtonState extends State<NautilusButton> {
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(gap),
+            // La bordure d'un DecoratedBox ne réserve pas d'espace : on décale
+            // le bouton de (contour + espace) pour que le contour soit entier.
+            padding: const EdgeInsets.all(gap + NautilusTokens.focusRingWidth),
             child: ConstrainedBox(
               constraints: const BoxConstraints(
                 minWidth: NautilusTokens.minTapTarget,

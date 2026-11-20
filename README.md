@@ -40,7 +40,7 @@ NautilusButton(
 )
 ```
 
-Cible >= 48 dp, texte agrandissable, contour de focus clavier visible.
+Cible >= 48 dp, texte agrandissable, contour de focus clavier visible (3 dp, séparé du bouton par 2 dp : la zone occupée dépasse le bouton de 5 dp par côté).
 
 ### Réutiliser le socle de tests d'accessibilité
 

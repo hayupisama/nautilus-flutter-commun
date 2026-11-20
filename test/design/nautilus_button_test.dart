@@ -164,6 +164,99 @@ void main() {
     expect(size.height, greaterThanOrEqualTo(48));
   });
 
+  group('géométrie et rendu du contour de focus', () {
+    for (final v in allVariants) {
+      testWidgets('${v.name} : 3 dp de contour, 2 dp d espace, cible >= 48', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          harness(
+            NautilusButton(label: 'Valider', onPressed: () {}),
+            variant: v,
+          ),
+        );
+        final ring = tester.getRect(find.byKey(NautilusButton.focusRingKey));
+        final btn = tester.getRect(find.byType(FilledButton));
+        const expected =
+            NautilusTokens.focusRingGap + NautilusTokens.focusRingWidth;
+        expect(btn.left - ring.left, expected);
+        expect(ring.right - btn.right, expected);
+        expect(btn.top - ring.top, expected);
+        expect(ring.bottom - btn.bottom, expected);
+        expect(_ringBorder(tester).top.width, 3);
+        expect(btn.width, greaterThanOrEqualTo(48));
+        expect(btn.height, greaterThanOrEqualTo(48));
+      });
+
+      testWidgets('${v.name} : contour peint en entier, espace de 2 dp libre', (
+        tester,
+      ) async {
+        final key = GlobalKey();
+        await tester.pumpWidget(
+          RepaintBoundary(
+            key: key,
+            child: harness(
+              NautilusButton(label: 'Valider', onPressed: () {}),
+              variant: v,
+            ),
+          ),
+        );
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pump();
+        final scheme = NautilusTheme.forVariant(v).colorScheme;
+        final ring = tester.getRect(find.byKey(NautilusButton.focusRingKey));
+        final btn = tester.getRect(find.byType(FilledButton));
+        final image = await tester.runAsync(() async {
+          final boundary =
+              key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+          final img = await boundary.toImage();
+          final bytes = (await img.toByteData())!;
+          return (img.width, bytes);
+        });
+        final (w, bytes) = image!;
+        Color at(double x, double y) {
+          final o = ((y.floor() * w) + x.floor()) * 4;
+          return Color.fromARGB(
+            bytes.getUint8(o + 3),
+            bytes.getUint8(o),
+            bytes.getUint8(o + 1),
+            bytes.getUint8(o + 2),
+          );
+        }
+
+        bool same(Color a, Color b) =>
+            (a.r - b.r).abs() < 0.02 &&
+            (a.g - b.g).abs() < 0.02 &&
+            (a.b - b.b).abs() < 0.02;
+        final x =
+            ring.center.dx; // bord haut : y entier, pas de flou horizontal
+        // Contour : 3 dp pleins (échantillons au centre de chaque dp).
+        for (final dx in [0.5, 1.5, 2.5]) {
+          expect(
+            same(at(x, ring.top + dx), scheme.onSurface),
+            isTrue,
+            reason: 'contour à $dx dp du bord',
+          );
+        }
+        // Espace : 2 dp de fond de page entre contour et bouton.
+        for (final dx in [3.5, 4.5]) {
+          expect(
+            same(at(x, ring.top + dx), scheme.surface),
+            isTrue,
+            reason: 'espace à $dx dp du bord',
+          );
+        }
+        // Bouton : commence juste après l'espace.
+        expect(same(at(x, btn.top + 6), scheme.surface), isFalse);
+        // WCAG 1.4.11 : contour / fond >= 3:1.
+        expect(
+          contrastRatio(scheme.onSurface, scheme.surface),
+          greaterThanOrEqualTo(3),
+        );
+      });
+    }
+  });
+
   testWidgets('libellé sémantique distinct du texte visible', (tester) async {
     final handle = tester.ensureSemantics();
     try {
