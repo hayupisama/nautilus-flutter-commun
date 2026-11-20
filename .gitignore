@@ -42,3 +42,4 @@ kubeconfig*
 .claude/settings.local.json
 .npmrc
 .netrc
+coverage/
