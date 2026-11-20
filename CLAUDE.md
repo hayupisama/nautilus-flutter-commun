@@ -15,7 +15,7 @@ lib/
 
 ## État
 
-Dépôt vide. Première tâche : `flutter create --template=package --project-name nautilus_commun .`
+Version 0.1.0 (U25) : `lib/design/` livré (tokens, 3 thèmes, provider Riverpod de variante, `NautilusButton` avec focus visible). Socle de tests a11y dans `test/support/accessibility.dart`. Dépendance UI : `material_ui` (BSD-3-Clause). `api/`, `auth/`, `realtime/`, `l10n/` : à venir. CI : couverte par U26.
 
 ## Règles
 

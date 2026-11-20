@@ -1,11 +1,11 @@
 name: nautilus_commun
-description: "Design system accessible, client API et authentification partagés par les applis Nautilus."
-version: 0.0.1
+description: "Design system accessible Nautilus : thèmes clair, sombre et contraste élevé, bouton accessible, socle de tests d'accessibilité."
+version: 0.1.0
 homepage:
 
 environment:
   sdk: ^3.14.0
-  flutter: ">=1.17.0"
+  flutter: ">=3.47.0"
 
 dependencies:
   flutter:

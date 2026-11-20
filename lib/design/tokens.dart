@@ -8,6 +8,10 @@ abstract final class NautilusTokens {
   static const double spacing = 8;
   static const double radius = 12;
 
+  /// Épaisseur du contour de focus (>= 2 dp, WCAG 2.4.13) et espace avec le bouton.
+  static const double focusRingWidth = 3;
+  static const double focusRingGap = 2;
+
   // Thème clair
   static const Color lightBackground = Color(0xFFFFFFFF);
   static const Color lightOnBackground = Color(0xFF1A1A1A);

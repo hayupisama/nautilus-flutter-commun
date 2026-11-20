@@ -32,11 +32,17 @@ Widget harness(
 }
 
 /// Vérifie les 4 guidelines d'accessibilité du projet sur l'écran courant.
+///
+/// Réutilisable par tout composant : `await expectMeetsAccessibilityGuidelines(tester);`
+/// après `pumpWidget(harness(...))`.
 Future<void> expectMeetsAccessibilityGuidelines(WidgetTester tester) async {
   final handle = tester.ensureSemantics();
-  await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
-  await expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
-  await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
-  await expectLater(tester, meetsGuideline(textContrastGuideline));
-  handle.dispose();
+  try {
+    await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+    await expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
+    await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+    await expectLater(tester, meetsGuideline(textContrastGuideline));
+  } finally {
+    handle.dispose();
+  }
 }
