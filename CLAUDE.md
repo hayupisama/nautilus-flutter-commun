@@ -15,7 +15,7 @@ lib/
 
 ## État
 
-Version 0.1.0 (U25) : `lib/design/` livré (tokens, 3 thèmes, provider Riverpod de variante, `NautilusButton` avec focus visible). Socle de tests a11y dans `test/support/accessibility.dart`. Dépendance UI : `material_ui` (BSD-3-Clause). `api/`, `auth/`, `realtime/`, `l10n/` : à venir. CI : couverte par U26.
+Version 0.2.0 (U25, U47, U48 : champ, carte, étape, `NautilusOptionList`, `NautilusSelector`) ; base 0.1.0 (U25) : `lib/design/` livré (tokens, 3 thèmes, provider Riverpod de variante, `NautilusButton` avec focus visible). Socle de tests a11y dans `test/support/accessibility.dart`. Dépendance UI : `material_ui` (BSD-3-Clause). `api/`, `auth/`, `realtime/`, `l10n/` : à venir. CI : couverte par U26.
 
 ## Règles
 
