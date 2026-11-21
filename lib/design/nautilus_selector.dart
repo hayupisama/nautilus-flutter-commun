@@ -1,3 +1,4 @@
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -9,6 +10,9 @@ import 'tokens.dart';
 /// Sélecteur à choix unique : une ligne de type champ qui affiche la valeur
 /// choisie et ouvre une page de choix (liste + bouton « Valider le choix »).
 /// À utiliser au-delà de [NautilusSelector.maxInlineOptions] options.
+/// Ce seuil est une règle de conception documentaire : ni ce composant ni
+/// `NautilusOptionList` ne le font respecter (la page de choix affiche
+/// elle-même une liste longue) ; c'est à l'écran appelant de choisir.
 ///
 /// - Lu « Question : valeur » (ou « Aucun choix fait »), avec l'indication
 ///   « Appuyez pour changer / choisir ».
@@ -59,6 +63,25 @@ class _NautilusSelectorState<T> extends State<NautilusSelector<T>> {
 
   final _node = FocusNode(debugLabel: 'selector');
   bool _focused = false;
+
+  @override
+  void didUpdateWidget(NautilusSelector<T> old) {
+    super.didUpdateWidget(old);
+    final message = widget.errorText;
+    final hadError = old.errorText != null && old.errorText!.isNotEmpty;
+    // Flutter n'annonce pas l'apparition d'une erreur : on l'annonce une fois
+    // (WCAG 3.3.1, 4.1.3).
+    if (message != null &&
+        message.isNotEmpty &&
+        (!hadError || old.errorText != message)) {
+      SemanticsService.sendAnnouncement(
+        View.of(context),
+        '${NautilusSelector.errorPrefix}$message',
+        Directionality.of(context),
+        assertiveness: Assertiveness.assertive,
+      );
+    }
+  }
 
   @override
   void dispose() {
@@ -201,7 +224,6 @@ class _NautilusSelectorState<T> extends State<NautilusSelector<T>> {
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Semantics(
-                liveRegion: true,
                 child: Text(
                   '${NautilusSelector.errorPrefix}${widget.errorText}',
                   style: theme.textTheme.bodyLarge?.copyWith(
@@ -264,13 +286,10 @@ class _ChoicePageState<T> extends State<_ChoicePage<T>> {
                     ),
                     const SizedBox(width: NautilusTokens.spacing),
                     Expanded(
-                      child: Semantics(
-                        header: true,
-                        child: Text(
-                          widget.title,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
+                      child: _FocusableTitle(
+                        title: widget.title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
@@ -284,7 +303,6 @@ class _ChoicePageState<T> extends State<_ChoicePage<T>> {
                     legend: widget.title,
                     options: widget.options,
                     selected: _draft == null ? <T>{} : {_draft as T},
-                    autofocus: true,
                     errorText: _missing ? NautilusSelector.missingChoice : null,
                     onChanged: (s) => setState(() {
                       _draft = s.isEmpty ? null : s.first;
@@ -309,6 +327,40 @@ class _ChoicePageState<T> extends State<_ChoicePage<T>> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Titre de la page de choix : reçoit le focus à l'ouverture (spec §7.3), puis
+/// Tab mène à l'option cochée (ou à la première).
+class _FocusableTitle extends StatefulWidget {
+  const _FocusableTitle({required this.title, this.style});
+
+  final String title;
+  final TextStyle? style;
+
+  @override
+  State<_FocusableTitle> createState() => _FocusableTitleState();
+}
+
+class _FocusableTitleState extends State<_FocusableTitle> {
+  bool _focused = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      header: true,
+      focusable: true,
+      focused: _focused,
+      child: Focus(
+        autofocus: true,
+        debugLabel: 'selector-title',
+        onFocusChange: (v) => setState(() => _focused = v),
+        child: NautilusFocusRing(
+          focused: _focused,
+          child: Text(widget.title, style: widget.style),
         ),
       ),
     );
