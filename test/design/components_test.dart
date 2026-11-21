@@ -23,6 +23,7 @@ void main() {
     'NautilusInfoCard (bouton)': () => NautilusInfoCard(
       title: 'Votre chauffeur arrive',
       body: 'Arrivée dans 4 minutes.',
+      semanticLabel: 'Ouvrir la course',
       onTap: () {},
     ),
     'NautilusStepIndicator': () => const NautilusStepIndicator(
@@ -76,7 +77,7 @@ void main() {
           const NautilusTextField(label: 'Prénom', errorText: 'Obligatoire'),
         ),
       );
-      expect(find.text('Erreur : Obligatoire'), findsOneWidget);
+      expect(find.text('Erreur : Obligatoire'), findsOneWidget);
     });
 
     testWidgets('texte à 200 % : aide longue passe à la ligne', (tester) async {
@@ -135,7 +136,14 @@ void main() {
       try {
         var taps = 0;
         await tester.pumpWidget(
-          harness(NautilusInfoCard(title: 'A', body: 'B', onTap: () => taps++)),
+          harness(
+            NautilusInfoCard(
+              title: 'A',
+              body: 'B',
+              semanticLabel: 'Ouvrir A',
+              onTap: () => taps++,
+            ),
+          ),
         );
         final node = tester.getSemantics(find.byType(NautilusInfoCard));
         expect(node.flagsCollection.isButton, isTrue);
@@ -182,9 +190,9 @@ void main() {
             ),
           ),
         );
-        expect(find.text('Étape 2 sur 4 : Destination'), findsOneWidget);
+        expect(find.text('Étape 2 sur 4 : Destination'), findsOneWidget);
         expect(
-          find.semantics.byLabel('Étape 2 sur 4 : Destination'),
+          find.semantics.byLabel('Étape 2 sur 4 : Destination'),
           findsOneWidget,
         );
       } finally {
@@ -206,6 +214,6 @@ void main() {
     );
     await tester.tap(find.byType(FilledButton));
     await tester.pump();
-    expect(find.text('Erreur : Adresse obligatoire'), findsOneWidget);
+    expect(find.text('Erreur : Adresse obligatoire'), findsOneWidget);
   });
 }

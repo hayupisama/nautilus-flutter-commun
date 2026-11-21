@@ -59,8 +59,10 @@ abstract final class NautilusTheme {
       scaffoldBackgroundColor: bg,
       materialTapTargetSize: MaterialTapTargetSize.padded,
       focusColor: primary,
-      textTheme: ThemeData(brightness: brightness).textTheme
-          .apply(bodyColor: fg, displayColor: fg),
+      textTheme: _accessibleTextTheme(
+        ThemeData(brightness: brightness).textTheme
+            .apply(bodyColor: fg, displayColor: fg),
+      ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: const Size(
@@ -75,6 +77,20 @@ abstract final class NautilusTheme {
           ),
         ),
       ),
+    );
+  }
+
+  /// Tailles de base (avant le réglage système) : corps 18 sp, titres de carte
+  /// 20 sp gras, boutons 18 sp gras, interligne 1,4.
+  static TextTheme _accessibleTextTheme(TextTheme t) {
+    TextStyle? sized(TextStyle? s, double size, [FontWeight? weight]) =>
+        s?.copyWith(fontSize: size, height: 1.4, fontWeight: weight);
+    return t.copyWith(
+      bodyLarge: sized(t.bodyLarge, 18),
+      bodyMedium: sized(t.bodyMedium, 18),
+      bodySmall: sized(t.bodySmall, 16),
+      titleMedium: sized(t.titleMedium, 20, FontWeight.w700),
+      labelLarge: sized(t.labelLarge, 18, FontWeight.w700),
     );
   }
 }

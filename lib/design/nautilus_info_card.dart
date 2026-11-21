@@ -1,13 +1,14 @@
 import 'package:material_ui/material_ui.dart';
 
+import 'nautilus_focus_ring.dart';
 import 'tokens.dart';
 
 /// Carte d'information accessible (titre, texte, icône décorative facultative).
 ///
 /// - Lue comme un seul bloc par le lecteur d'écran ([semanticLabel] si le
 ///   libellé doit différer du texte visible).
-/// - Si [onTap] est fourni, la carte est un bouton : cible >= 48 dp, contour de
-///   focus visible. Sinon elle est purement informative.
+/// - Si [onTap] est fourni, la carte est un bouton : cible >= 48 dp, anneau de
+///   focus externe (comme `NautilusButton`). Sinon elle est purement informative.
 /// - Contour >= 3:1, texte qui passe à la ligne jusqu'à 200 %.
 ///
 /// Exemple (temps d'approche en texte, jamais seulement sur la carte) :
@@ -18,6 +19,16 @@ import 'tokens.dart';
 ///   icon: Icons.directions_car,
 /// )
 /// ```
+///
+/// Carte bouton :
+/// ```dart
+/// NautilusInfoCard(
+///   title: 'Course de mardi',
+///   body: 'Gare de Nantes, 14 h 30',
+///   semanticLabel: 'Voir le détail de la course de mardi',
+///   onTap: openDetail,
+/// )
+/// ```
 class NautilusInfoCard extends StatefulWidget {
   const NautilusInfoCard({
     super.key,
@@ -26,7 +37,11 @@ class NautilusInfoCard extends StatefulWidget {
     this.icon,
     this.semanticLabel,
     this.onTap,
-  });
+  }) : assert(
+         onTap == null || semanticLabel != null,
+         "Une carte bouton doit fournir semanticLabel (verbe d'action, "
+         'ex. « Voir le détail de la course »).',
+       );
 
   final String title;
   final String body;
@@ -37,7 +52,8 @@ class NautilusInfoCard extends StatefulWidget {
   /// Libellé lu par le lecteur d'écran, si différent de « titre. texte ».
   final String? semanticLabel;
 
-  /// Non null : la carte est un bouton.
+  /// Non null : la carte est un bouton ; [semanticLabel] est alors obligatoire
+  /// et doit commencer par un verbe d'action.
   final VoidCallback? onTap;
 
   @override
@@ -88,10 +104,7 @@ class _NautilusInfoCardState extends State<NautilusInfoCard> {
       decoration: BoxDecoration(
         color: scheme.surface,
         borderRadius: radius,
-        border: Border.all(
-          color: scheme.onSurface,
-          width: _focused ? NautilusTokens.focusRingWidth : 1.5,
-        ),
+        border: Border.all(color: scheme.onSurface, width: 1.5),
       ),
       child: interactive
           ? InkWell(
@@ -107,13 +120,16 @@ class _NautilusInfoCardState extends State<NautilusInfoCard> {
             )
           : content,
     );
+    final shown = interactive
+        ? NautilusFocusRing(focused: _focused, child: card)
+        : card;
     return Semantics(
       container: true,
       button: interactive,
       label: widget.semanticLabel ?? '${widget.title}. ${widget.body}',
       excludeSemantics: true,
       onTap: widget.onTap,
-      child: card,
+      child: shown,
     );
   }
 }

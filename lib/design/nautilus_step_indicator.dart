@@ -6,7 +6,7 @@ import 'tokens.dart';
 ///
 /// - La progression est toujours donnée en texte, jamais seulement par la
 ///   couleur : texte « Étape X sur N », segments pleins (faites/en cours) ou
-///   vides (à venir).
+///   vides (à venir) ; l'étape en cours a un contour plus épais.
 /// - Lu d'un seul bloc : « Étape 2 sur 4 : Destination ».
 /// - Informatif (non interactif) ; texte agrandissable jusqu'à 200 %.
 ///
@@ -37,13 +37,16 @@ class NautilusStepIndicator extends StatelessWidget {
   /// Texte « Étape X sur N » (visible et lu).
   String get progressText => 'Étape $currentStep sur $totalSteps';
 
+  /// Espace insécable avant le deux-points (jamais seul en début de ligne).
+  static const separator = ' : ';
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
     final label = stepLabel == null
         ? progressText
-        : '$progressText : $stepLabel';
+        : '$progressText$separator$stepLabel';
     return Semantics(
       container: true,
       label: label,
@@ -69,7 +72,11 @@ class NautilusStepIndicator extends StatelessWidget {
                     height: 12,
                     decoration: BoxDecoration(
                       color: i <= currentStep ? scheme.primary : scheme.surface,
-                      border: Border.all(color: scheme.onSurface, width: 1.5),
+                      border: Border.all(
+                        color: scheme.onSurface,
+                        // Repère de forme : contour épais sur l'étape en cours.
+                        width: i == currentStep ? 3 : 1.5,
+                      ),
                       borderRadius: BorderRadius.circular(6),
                     ),
                   ),
