@@ -124,7 +124,14 @@ void main() {
           ),
         );
         expect(find.semantics.byLabel('Arrivée. Dans 4 minutes'), findsOne);
-        final node = tester.getSemantics(find.byType(NautilusInfoCard));
+        final node = tester.getSemantics(
+          find
+              .descendant(
+                of: find.byType(NautilusInfoCard),
+                matching: find.byType(Semantics),
+              )
+              .first,
+        );
         expect(node.childrenCount, 0);
       } finally {
         handle.dispose();
@@ -145,7 +152,14 @@ void main() {
             ),
           ),
         );
-        final node = tester.getSemantics(find.byType(NautilusInfoCard));
+        final node = tester.getSemantics(
+          find
+              .descendant(
+                of: find.byType(NautilusInfoCard),
+                matching: find.byType(Semantics),
+              )
+              .first,
+        );
         expect(node.flagsCollection.isButton, isTrue);
         expect(
           tester.getSize(find.byType(InkWell)).height,

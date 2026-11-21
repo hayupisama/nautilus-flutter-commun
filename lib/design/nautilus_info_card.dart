@@ -80,6 +80,7 @@ class _NautilusInfoCardState extends State<NautilusInfoCard> {
           ],
           Expanded(
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
@@ -123,13 +124,18 @@ class _NautilusInfoCardState extends State<NautilusInfoCard> {
     final shown = interactive
         ? NautilusFocusRing(focused: _focused, child: card)
         : card;
-    return Semantics(
-      container: true,
-      button: interactive,
-      label: widget.semanticLabel ?? '${widget.title}. ${widget.body}',
-      excludeSemantics: true,
-      onTap: widget.onTap,
-      child: shown,
+    // Hauteur du contenu, même sous une contrainte stricte (Expanded).
+    return Align(
+      alignment: Alignment.topCenter,
+      heightFactor: 1,
+      child: Semantics(
+        container: true,
+        button: interactive,
+        label: widget.semanticLabel ?? '${widget.title}. ${widget.body}',
+        excludeSemantics: true,
+        onTap: widget.onTap,
+        child: shown,
+      ),
     );
   }
 }

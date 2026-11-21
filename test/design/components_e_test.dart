@@ -12,6 +12,7 @@ Border _ring(WidgetTester t) =>
         as Border;
 
 void main() {
+  _cardSizeTests();
   group('E1 anneau de focus externe', () {
     for (final v in allVariants) {
       testWidgets('champ (${v.name})', (tester) async {
@@ -180,5 +181,32 @@ void main() {
         );
       });
     }
+  });
+}
+
+void _cardSizeTests() {
+  Finder box() => find
+      .descendant(
+        of: find.byType(NautilusInfoCard),
+        matching: find.byType(DecoratedBox),
+      )
+      .first;
+  const card = NautilusInfoCard(
+    title: 'Votre chauffeur arrive',
+    body: 'Arrivée dans 4 minutes.',
+  );
+
+  testWidgets('taille du contenu dans un Center', (tester) async {
+    await tester.pumpWidget(harness(card));
+    expect(tester.getSize(find.byType(NautilusInfoCard)).height, lessThan(200));
+    expect(tester.getSize(box()).height, lessThan(200));
+  });
+
+  testWidgets('taille du contenu dans un Expanded', (tester) async {
+    await tester.pumpWidget(
+      harness(const Column(children: [Expanded(child: card)])),
+    );
+    expect(tester.getSize(box()).height, lessThan(200));
+    expect(tester.getSize(box()).height, greaterThanOrEqualTo(48));
   });
 }
