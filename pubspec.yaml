@@ -1,6 +1,6 @@
 name: nautilus_commun
 description: "Design system accessible Nautilus : thèmes clair, sombre et contraste élevé, bouton accessible, socle de tests d'accessibilité."
-version: 0.1.0
+version: 0.2.0
 homepage:
 
 environment:
